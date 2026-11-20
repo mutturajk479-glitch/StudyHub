@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyHub Lesson</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px #00000015;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>StudyHub</h1>
+    <p>Lesson Learning Center</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2 id="lessonTitle">Loading Lesson...</h2>
+
+        <p id="lessonContent"></p>
+
+        <button onclick="history.back()">Back to Course</button>
+
+    </div>
+
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+
+    const lessonNumber = params.get("id");
+
+    const lessons = {
+        1: {
+            title: "Lesson 1: Introduction",
+            content: "Welcome to this course! In this lesson, you will learn the basic introduction and understand what this subject is about."
+        },
+
+        2: {
+            title: "Lesson 2: Fundamentals",
+            content: "In this lesson, you will understand the important fundamentals and basic concepts of the subject."
+        },
+
+        3: {
+            title: "Lesson 3: Practical Learning",
+            content: "In this lesson, you will learn how to apply the concepts through practical examples and exercises."
+        },
+
+        4: {
+            title: "Lesson 4: Final Revision",
+            content: "In this lesson, you will revise the important topics and review what you have learned."
+        }
+    };
+
+    const lesson = lessons[lessonNumber];
+
+    if (lesson) {
+        document.getElementById("lessonTitle").textContent =
+            lesson.title;
+
+        document.getElementById("lessonContent").textContent =
+            lesson.content;
+    } else {
+        document.getElementById("lessonTitle").textContent =
+            "Lesson Not Found";
+
+        document.getElementById("lessonContent").textContent =
+            "Please select a valid lesson.";
+    }
+</script>
+
+</body>
+</html>

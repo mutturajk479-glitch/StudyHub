@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>StudyHub - Python Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        .question {
+            padding: 15px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Python Time Complexity Quiz</h1>
+    <p>Based on your PDF - Page 1</p>
+
+    <form id="quizForm">
+
+        <div id="questions"></div>
+
+        <button type="submit">Submit Quiz</button>
+
+    </form>
+
+    <div id="result" class="result"></div>
+
+</div>
+
+<script>
+
+const questions = [
+    {
+        question: "What does Big O describe?",
+        options: [
+            "Exact execution time",
+            "How operations grow as input size grows",
+            "Number of code lines",
+            "Memory only"
+        ],
+        answer: 1
+    },
+    {
+        question: "Which complexity is constant?",
+        options: ["O(n)", "O(log n)", "O(1)", "O(n²)"],
+        answer: 2
+    },
+    {
+        question: "Which operation is O(log n)?",
+        options: ["Binary search", "Find maximum", "Sorting", "Compare pairs"],
+        answer: 0
+    },
+    {
+        question: "What is the amortized complexity of append(x)?",
+        options: ["O(n)", "O(1)", "O(n²)", "O(log n)"],
+        answer: 1
+    },
+    {
+        question: "Why is insert(0, x) O(n)?",
+        options: [
+            "It sorts elements",
+            "Other elements shift",
+            "It searches strings",
+            "It halves input"
+        ],
+        answer: 1
+    },
+    {
+        question: "What is the complexity of x in arr?",
+        options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+        answer: 2
+    },
+    {
+        question: "Why do string transformations create new strings?",
+        options: [
+            "Strings are immutable",
+            "Strings are sorted",
+            "Strings have no indexes",
+            "Strings use nested loops"
+        ],
+        answer: 0
+    },
+    {
+        question: "What is the typical complexity of split()?",
+        options: ["O(1)", "O(n)", "O(n²)", "O(2^n)"],
+        answer: 1
+    },
+    {
+        question: "What is the complexity of two separate loops of n?",
+        options: ["O(n²)", "O(log n)", "O(n)", "O(n³)"],
+        answer: 2
+    },
+    {
+        question: "What is the complexity of three nested loops of n?",
+        options: ["O(n)", "O(n²)", "O(n³)", "O(log n)"],
+        answer: 2
+    }
+];
+
+const questionsDiv = document.getElementById("questions");
+
+questions.forEach((q, index) => {
+
+    let html = `
+        <div class="question">
+            <h3>${index + 1}. ${q.question}</h3>
+    `;
+
+    q.options.forEach((option, optionIndex) => {
+        html += `
+            <label>
+                <input type="radio"
+                    name="question${index}"
+                    value="${optionIndex}"
+                    required>
+                ${option}
+            </label>
+            <br>
+        `;
+    });
+
+    html += "</div>";
+
+    questionsDiv.innerHTML += html;
+});
+
+  document.getElementById("quizForm").addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const token = localStorage.getItem("studyhubToken");
+
+    if (!token) {
+        alert("Please login first!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    let score = 0;
+
+    questions.forEach((q, index) => {
+
+        const selected = document.querySelector(
+            `input[name="question${index}"]:checked`
+        );
+
+        if (Number(selected.value) === q.answer) {
+            score++;
+        }
+
+    });
+
+    try {
+        const response = await fetch("/api/quiz-results", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+                quiz_name: "Python Time Complexity - Page 1",
+                score: score,
+                total_questions: questions.length
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.message || "Unable to save quiz result.");
+            return;
+        }
+
+        document.getElementById("result").textContent =
+            "Your Score: " + score + " / " + questions.length +
+            " — Result saved successfully!";
+
+    } catch (error) {
+        alert("Unable to connect to StudyHub server.");
+    }
+
+});
+
+    
+</script>
+
+</body>
+</html>

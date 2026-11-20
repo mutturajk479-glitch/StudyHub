@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>StudyHub - My Progress</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stats .card {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>My Learning Progress</h1>
+    <p>Track your StudyHub quiz performance.</p>
+
+    <div class="stats">
+
+        <div class="card">
+            <h3>Total Quizzes</h3>
+            <h2 id="totalQuizzes">0</h2>
+        </div>
+
+        <div class="card">
+            <h3>Latest Score</h3>
+            <h2 id="latestScore">--</h2>
+        </div>
+
+        <div class="card">
+            <h3>Average Score</h3>
+            <h2 id="averageScore">--</h2>
+        </div>
+
+    </div>
+
+    <div class="card">
+        <h2>Quiz History</h2>
+        <div id="history">Loading results...</div>
+    </div>
+
+    <button onclick="window.location.href='student.html'">
+        Back to Dashboard
+    </button>
+
+</div>
+
+<script>
+
+async function loadProgress() {
+
+    const token = localStorage.getItem("studyhubToken");
+
+    if (!token) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+
+        const response = await fetch("/api/quiz-results", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("Unable to load progress");
+        }
+
+        const results = await response.json();
+
+        document.getElementById("totalQuizzes").textContent =
+            results.length;
+
+        if (results.length === 0) {
+
+            document.getElementById("history").textContent =
+                "No quiz attempts yet.";
+
+            return;
+        }
+
+        const latest = results[0];
+
+        document.getElementById("latestScore").textContent =
+            latest.score + "/" + latest.total_questions;
+
+        const totalPercentage = results.reduce((sum, result) => {
+            return sum + (result.score / result.total_questions) * 100;
+        }, 0);
+
+        const average = totalPercentage / results.length;
+
+        document.getElementById("averageScore").textContent =
+            average.toFixed(1) + "%";
+
+        const history = document.getElementById("history");
+        history.innerHTML = "";
+
+        results.forEach(result => {
+
+            const item = document.createElement("div");
+            item.className = "card";
+
+            const title = document.createElement("h3");
+            title.textContent = result.quiz_name;
+
+            const score = document.createElement("p");
+            score.textContent =
+                "Score: " + result.score + "/" +
+                result.total_questions;
+
+            const date = document.createElement("p");
+            date.textContent = "Date: " + result.created_at;
+
+            item.append(title, score, date);
+            history.appendChild(item);
+
+        });
+
+    } catch (error) {
+
+        document.getElementById("history").textContent =
+            "Unable to load progress. Please try again.";
+
+    }
+}
+
+loadProgress();
+
+</script>
+
+</body>
+</html>
